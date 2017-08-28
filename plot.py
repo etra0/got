@@ -19,13 +19,29 @@ def time_to_float(value):
 
 def plot_by_time(df):
     fig = plt.figure(figsize=(8,20))
-    ax = fig.add_subplot(111)
+    ax = fig.add_subplot(1, 1, 1)
     
-    df.plot.barh(ax=ax, x='actor', y=df.columns[2:len(df.columns)-1], \
-                    stacked=True, width=.6)
+#    df.plot.barh(ax=ax, x='actor', y=df.columns[2:len(df.columns)-1], \
+#                    stacked=True, width=.6)
+
+    colormap = plt.get_cmap('Greens')
+    colors = [colormap(i) for i in np.linspace(0, 1, len(SEASONS))]
+
+    current_seasons = df.columns[2:len(df.columns) - 1]
+
+    # for stacked bar, we need to use the before plot.
+    for n, season in enumerate(current_seasons):
+        temp_dataset = df.loc[:, ['actor', season]]
+
+        for i, row in df.iterrows():
+            loc = df.loc[df['actor'] == row['actor'], current_seasons[0:n]]
+            bottom = loc.sum(1)
+            current_plot = ax.barh(bottom=i, width=row[season],
+                    label=season,
+                    color=colors[n], left=bottom)
 
     ax.axvline(df.median()['total'], color='black', linestyle="dashed")
-    
+    plt.gca().invert_yaxis()
     ax.set_title("Screen time of GOT characters")
     ax.set_ylabel("")
     ax.set_xlabel("Time in minutes")
@@ -134,8 +150,6 @@ for col in df.columns[2:len(df.columns) - 1]:
     df['total'] += df[col]
 
 df = df.sort_values(by="total")
-for season in df.columns[2:len(df.columns)-1]:
-    print(df[season].sum() / 60)
 
 # Just uncomment the plot you want
 plot_by_time(df)
