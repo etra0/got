@@ -5,6 +5,7 @@ import numpy as np
 
 plt.style.use("ggplot")
 
+SEASONS = list(map(lambda x: "Season %d" % x, range(1, 8)))
 
 # the time is stored as minutes:seconds, ignoring if they make more than
 # one hour.
@@ -20,7 +21,7 @@ def plot_by_time(df):
     fig = plt.figure(figsize=(8,20))
     ax = fig.add_subplot(111)
     
-    df.plot.barh(ax=ax, x='actor', y=df.columns[1:len(df.columns)-1], \
+    df.plot.barh(ax=ax, x='actor', y=df.columns[2:len(df.columns)-1], \
                     stacked=True, width=.6)
 
     ax.axvline(df.median()['total'], color='black', linestyle="dashed")
@@ -30,9 +31,9 @@ def plot_by_time(df):
     ax.set_xlabel("Time in minutes")
     fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
     plt.legend()
-    ax.legend(["Median", "Season 1", "Season 2", "Season 3", "Season 4", "Season 5", "Season 6"])
+    ax.legend(["Median"] + SEASONS)
     fig.text(.02, .005, "Source: http://imdb.com/list/ls076752033/")
-    fig.savefig("all_actors.png", dpi=300, format="png")
+    fig.savefig("out/all_actors.png", dpi=300, format="png")
 
 
 def plot_by_time_by_season(df):
@@ -42,7 +43,7 @@ def plot_by_time_by_season(df):
     cmap = plt.get_cmap('Set1')
     colors = [cmap(i) for i in np.linspace(0, 1, 6)]
 
-    for season in df.columns[1:len(df.columns)-1]:
+    for season in df.columns[2:len(df.columns)-1]:
         # we need to sort depending of the season.
         temp = df.sort_values(by=season)
 
@@ -59,7 +60,7 @@ def plot_by_time_by_season(df):
     
     fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
     fig.text(.02, .005, "Source: http://imdb.com/list/ls076752033/")
-    fig.savefig("char_by_season.png", dpi=300, format="png")
+    fig.savefig("out/char_by_season.png", dpi=300, format="png")
 
 def by_house(df):
     # in most cases, last name is the house.
@@ -78,15 +79,15 @@ def by_house(df):
 
     grouped = grouped.reset_index().sort_values(by='total')
 
-    grouped.iloc[-10:].plot.barh(ax=ax, x='house', y=df.columns[1:len(df.columns)-2], \
+    grouped.iloc[-10:].plot.barh(ax=ax, x='house', y=df.columns[2:len(df.columns)-2], \
                     stacked=True, width=.6)
 
-    ax.legend(["Season 1", "Season 2", "Season 3", "Season 4", "Season 5", "Season 6"])
+    ax.legend(SEASONS)
     ax.set_title("Screen time by house")
     ax.set_xlabel("Minutes")
 
     plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-    fig.savefig("by_house.png", dpi=300, format="png")
+    fig.savefig("out/by_house.png", dpi=300, format="png")
 
 def by_season(df):
     # in most cases, last name is the house.
@@ -123,21 +124,21 @@ def by_season(df):
         plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
 
     fig.text(.02, .005, "Source: http://imdb.com/list/ls076752033/")
-    fig.savefig("by_season.png", dpi=300, format="png")
+    fig.savefig("out/by_season.png", dpi=300, format="png")
 
 
-df = pd.read_csv("all_seasons.csv", sep=";")
+df = pd.read_csv("all_seasons.csv")
 df['total'] = 0
-for col in df.columns[1:len(df.columns) - 1]:
+for col in df.columns[2:len(df.columns) - 1]:
     df[col] = df[col].map(time_to_float)
     df['total'] += df[col]
 
 df = df.sort_values(by="total")
-for season in df.columns[1:len(df.columns)-1]:
+for season in df.columns[2:len(df.columns)-1]:
     print(df[season].sum() / 60)
 
 # Just uncomment the plot you want
-#plot_by_time(df)
+plot_by_time(df)
 #plot_by_time_by_season(df)
 #by_house(df)
 #by_season(df)
