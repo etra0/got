@@ -1,3 +1,4 @@
 .vscode
 *.html
 color_palettes
+.DS_Store
