@@ -55,7 +55,8 @@ def plot_all_characters(df):
                 _color = colors[n]
 
             label = None
-            if i==1:
+            # tyrion isn't dead, so we'll use him for the legend
+            if row['actor'] == 'Tyrion Lannister':
                 label = season.replace("_", " ").title()
 
             current_plot = ax.barh(bottom=i, width=row[season],
@@ -227,7 +228,7 @@ if __name__ == '__main__':
     df.index = range(len(df))
 
     plot_all_characters(df)
-    by_house(df)
-    top_house_by_season(df)
-    top_by_season(df)
+#    by_house(df)
+#    top_house_by_season(df)
+#    top_by_season(df)
 
