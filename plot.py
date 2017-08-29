@@ -24,29 +24,62 @@ def plot_by_time(df):
 #    df.plot.barh(ax=ax, x='actor', y=df.columns[2:len(df.columns)-1], \
 #                    stacked=True, width=.6)
 
-    colormap = plt.get_cmap('Greens')
-    colors = [colormap(i) for i in np.linspace(0, 1, len(SEASONS))]
+    colors = [
+            '#01a186',
+            '#e24a33',
+            '#348abd',
+            '#ff930f',
+            '#988ed5',
+            '#fbc15e',
+            '#8eba42'
+            ]
 
     current_seasons = df.columns[2:len(df.columns) - 1]
 
     # for stacked bar, we need to use the before plot.
     for n, season in enumerate(current_seasons):
-        temp_dataset = df.loc[:, ['actor', season]]
 
         for i, row in df.iterrows():
-            loc = df.loc[df['actor'] == row['actor'], current_seasons[0:n]]
-            bottom = loc.sum(1)
+            left = row[current_seasons[0:n]].sum()
+
+            death = row['death']
+            if death != 'None' and int(death[1:3]) == n + 1:
+                _color = 'black'
+                print("%s died in %s" % (df.iloc[i, 0], df.iloc[i, 1]))
+            else:
+                _color = colors[n]
+
+            label = season
+            if not i:
+                label = None
+
             current_plot = ax.barh(bottom=i, width=row[season],
-                    label=season,
-                    color=colors[n], left=bottom)
+                    color=_color,
+                    label=label, left=left)
+
+            if _color == 'black' and current_plot[0].get_width() > 20:
+                ax.text(current_plot[0].get_x() + current_plot[0].get_width()/2,
+                        current_plot[0].get_y(),
+                        row['death'][:3],
+                        va='bottom',
+                        ha='center',
+                        color='white')
 
     ax.axvline(df.median()['total'], color='black', linestyle="dashed")
-    plt.gca().invert_yaxis()
-    ax.set_title("Screen time of GOT characters")
+
+    # ticks stuff
+    ax.set_yticks(range(len(df)))
+    ax.set_yticklabels(df.loc[:, 'actor'][::-1])
+    ax.set_ylim(-0.8, len(df))
+    ax.set_xticks(range(0, 390, 60))
     ax.set_ylabel("")
     ax.set_xlabel("Time in minutes")
+
+    ax.set_title("Screen time of GOT characters")
     fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-    plt.legend()
+#TODO: FIX LEGEND!
+#    plt.legend()
+#    plt.gca().invert_yaxis()
     ax.legend(["Median"] + SEASONS)
     fig.text(.02, .005, "Source: http://imdb.com/list/ls076752033/")
     fig.savefig("out/all_actors.png", dpi=300, format="png")
