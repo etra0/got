@@ -234,7 +234,7 @@ def generate_top_10_csv(df):
         top_10 = False
 
         for season in SEASONS:
-            if 0 < temp[k][season] <= 10:
+            if 0 < temp[k]['i_' + season] <= 10:
                 top_10 = True
 
         if top_10:

@@ -1,10 +1,12 @@
 d3.json('./data.json', function(data) {
 
 	// global variables
+	console.log(data)
 	var actors = [];
 	data.forEach(function(d) {
 		actors.push(d.actor);
 	});
+	console.log(actors);
 
 	var margin = {top: 20, right: 20, bottom: 30, left: 120},
 		width = 960 - margin.left - margin.right,
@@ -37,16 +39,23 @@ d3.json('./data.json', function(data) {
 	data.forEach(function (d, i) {
 		current_line = canvas.append('g');
 
+		var handle_color = function(_d, _i) {
+			if (d.death === _i + 1)
+				return "url(http://www.ldoceonline.com/media/english/illustration/skull.jpg)";
+			else
+				return color_scale(i);
+		}
+
 		var current_data = (function() {
 			var _d = [
-				{x: 0, y: d.season_1},
-				{x: 1, y: d.season_1},
-				{x: 2, y: d.season_2},
-				{x: 3, y: d.season_3},
-				{x: 4, y: d.season_4},
-				{x: 5, y: d.season_5},
-				{x: 6, y: d.season_6},
-				{x: 7, y: d.season_7}]
+				{x: 0, y: d.i_season_1},
+				{x: 1, y: d.i_season_1},
+				{x: 2, y: d.i_season_2},
+				{x: 3, y: d.i_season_3},
+				{x: 4, y: d.i_season_4},
+				{x: 5, y: d.i_season_5},
+				{x: 6, y: d.i_season_6},
+				{x: 7, y: d.i_season_7}]
 
 			// we clean all the first nodes major than 10
 			for (_i = 0; _i < _d.length; _i++) {
@@ -110,18 +119,20 @@ d3.json('./data.json', function(data) {
 					return x_scale(-100);
 			})
 			.attr('cy', function(d) { return y_scale(d.y); })
-			.attr('fill', function() { return color_scale(i); })
+			.attr('fill', function(_d, _i) { return handle_color(_d, _i); })
 			.attr('stroke', 'black')
 			.attr('stroke-width', 2)
-			.on('mouseover', function() {
+			.on('mouseover', function(_d, _i) {
 				var _current = d3.select(this);
-				_current.attr('fill', 'black');
+				_current.attr('fill', 'red');
 				var _text = d3.select('.character');
-				_text.text(d.actor);
+				_text.text(d.actor + " " + d['season_' + _i] + " Minutos");
 			})
 			.on('mouseout', function() {
 				var _current = d3.select(this);
 				_current.attr('fill', function() { return color_scale(i); });
+				var _text = d3.select('.character');
+				_text.text("Game of Thrones");
 			});
 
 	});
