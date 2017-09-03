@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import json
 import matplotlib
 
 matplotlib.rcParams['font.sans-serif'] = ['Open Sans']
@@ -216,6 +217,32 @@ def top_house_by_season(df):
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig("out/top_house_by_season.png", dpi=300, format="png")
 
+def generate_top_10_csv(df):
+    temp = df
+    for season in SEASONS:
+        temp = temp.sort_values(by=season, ascending=False)
+        temp.index = range(1, len(temp) + 1)
+        temp.ix[:,'i_' + season] = temp.index
+
+    temp = temp.sort_values(by='i_season_1', ascending=True)
+
+    print (temp)
+    temp = temp.iloc[:20,:].to_dict(orient='index')
+    _list = []
+    
+    for k in temp:
+        top_10 = False
+
+        for season in SEASONS:
+            if 0 < temp[k][season] <= 10:
+                top_10 = True
+
+        if top_10:
+            _list.append(temp[k])
+
+    with open('data.json', 'w') as filedump:
+        filedump.write(json.dumps(_list))
+
 
 if __name__ == '__main__':
     df = pd.read_csv("all_seasons.csv")
@@ -227,7 +254,8 @@ if __name__ == '__main__':
     df = df.sort_values(by="total", ascending=True)
     df.index = range(len(df))
 
-    plot_all_characters(df)
+    generate_top_10_csv(df)
+#    plot_all_characters(df)
 #    by_house(df)
 #    top_house_by_season(df)
 #    top_by_season(df)
