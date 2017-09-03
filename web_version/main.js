@@ -6,7 +6,6 @@ d3.json('./data.json', function(data) {
 	data.forEach(function(d) {
 		actors.push(d.actor);
 	});
-	console.log(actors);
 
 	var margin = {top: 20, right: 20, bottom: 30, left: 120},
 		width = 960 - margin.left - margin.right,
@@ -34,16 +33,19 @@ d3.json('./data.json', function(data) {
 		.attr('width', width + margin.left + margin.right)
 		.attr('height', height + margin.top + margin.bottom)
 		.append('g')
-			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+			
 
 	data.forEach(function (d, i) {
 		current_line = canvas.append('g');
 
 		var handle_color = function(_d, _i) {
-			if (d.death === _i + 1)
-				return "url(http://www.ldoceonline.com/media/english/illustration/skull.jpg)";
-			else
+			if (_d.death === _i + 1)
+				return "white";
+			else {
+				console.log(_d.death, _i + 1);
 				return color_scale(i);
+			}
 		}
 
 		var current_data = (function() {
@@ -130,7 +132,7 @@ d3.json('./data.json', function(data) {
 			})
 			.on('mouseout', function() {
 				var _current = d3.select(this);
-				_current.attr('fill', function() { return color_scale(i); });
+				_current.attr('fill', function(_d, _i) { return handle_color(_d, _i); });
 				var _text = d3.select('.character');
 				_text.text("Game of Thrones");
 			});
