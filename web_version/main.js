@@ -1,13 +1,12 @@
 d3.json('./data.json', function(data) {
 
-	// global variables
-	console.log(data)
+	// global variables & main definitions of d3
 	var actors = [];
 	data.forEach(function(d) {
 		actors.push(d.actor);
 	});
 
-	var margin = {top: 20, right: 20, bottom: 30, left: 120},
+	var margin = {top: 40, right: 20, bottom: 30, left: 120},
 		width = 960 - margin.left - margin.right,
 		height = 500 - margin.top - margin.bottom;
 	//
@@ -18,15 +17,23 @@ d3.json('./data.json', function(data) {
 
 	var y_scale = d3.scaleLinear()
 		.domain([1, 10])
-		.range([0, height]);
+		.range([0, height - 90]);
 
 	var color_scale = d3.scaleLinear()
 		.domain([1, 20])
 		.range(['#FE860B', '#0C7E9E'])
 
-	var axis = d3.axisLeft(y_scale)
+	var y_axis = d3.axisLeft(y_scale)
 		.tickFormat(function(d, i) {
 			return actors[i];
+		});
+
+	var x_axis = d3.axisTop(x_scale)
+		.ticks(8)
+		.tickFormat(function(d, i ) {
+			if (!i)
+				return ""
+			return "Season " + i;
 		});
 
 	var canvas = d3.select(".container").append('svg')
@@ -36,28 +43,37 @@ d3.json('./data.json', function(data) {
 			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 			
 
-	data.forEach(function (d, i) {
+	data.forEach(function (data, index) {
+		// De ahora en adelante,
+		// data hara referencia a la data global, que contiene
+		// death, i_season_n, season_n
+		// Ademas, todas las variables dentro de funciones
+		// comenzaran con un guion bajo.
+
+		// Es necesario agruparlo para separar cada personaje.
 		current_line = canvas.append('g');
 
-		var handle_color = function(_d, _i) {
-			if (_d.death === _i + 1)
+		var handle_color = function(_d, _i, circle=true) {
+			if (data.death === _i + 1 && circle)
 				return "white";
 			else {
-				console.log(_d.death, _i + 1);
-				return color_scale(i);
+				console.log("current death:", data.death, "supposed death:", _i + 1);
+				return color_scale(index);
 			}
 		}
 
-		var current_data = (function() {
+		// definition of the data points that will be used in 
+		// the draw of the path
+		var data_points = (function() {
 			var _d = [
-				{x: 0, y: d.i_season_1},
-				{x: 1, y: d.i_season_1},
-				{x: 2, y: d.i_season_2},
-				{x: 3, y: d.i_season_3},
-				{x: 4, y: d.i_season_4},
-				{x: 5, y: d.i_season_5},
-				{x: 6, y: d.i_season_6},
-				{x: 7, y: d.i_season_7}]
+				{x: 0, y: data.i_season_1},
+				{x: 1, y: data.i_season_1},
+				{x: 2, y: data.i_season_2},
+				{x: 3, y: data.i_season_3},
+				{x: 4, y: data.i_season_4},
+				{x: 5, y: data.i_season_5},
+				{x: 6, y: data.i_season_6},
+				{x: 7, y: data.i_season_7}]
 
 			// we clean all the first nodes major than 10
 			for (_i = 0; _i < _d.length; _i++) {
@@ -84,7 +100,6 @@ d3.json('./data.json', function(data) {
 						}
 					}
 					if (_all_major) {
-						console.log(d.actor, _i);
 						for (_j = _i; _j < _d.length; _j++) {
 							_d[_j].x = _d[_i-1].x;
 							_d[_j].y = _d[_i-1].y;
@@ -104,13 +119,30 @@ d3.json('./data.json', function(data) {
 
 		// LINE PLOT
 		current_line.append('path')
-			.attr("d", lineFunction(current_data))
-			.attr("stroke", function(d) { return color_scale(i); })
+			.attr("d", lineFunction(data_points))
+			.attr("stroke", function() { return color_scale(index); })
 			.attr('stroke-width', 10)
+			.on('mouseover', function() {
+				var _current = d3.select(this);
+				_current.attr('stroke', 'red');
+
+				// TODO: reemplazar por un HOVER
+				var _text = d3.select('.character');
+				_text.text(data.actor);
+			})
+			.on('mouseout', (function(_d, _i) {
+				var _current = d3.select(this);
+				_current.attr('stroke', function() { return handle_color(_d, _i, circle=false); });
+
+				// TODO: reemplazar por un HOVER
+				var _text = d3.select('.character');
+				_text.text("Game of Thrones");
+			}))
 			.attr('fill', 'none');
 
+		// Circulos del plot principal
 		current_line.selectAll('circle')
-			.data(current_data)
+			.data(data_points)
 			.enter()
 			.append('circle')
 			.attr('r', 10)
@@ -121,22 +153,31 @@ d3.json('./data.json', function(data) {
 					return x_scale(-100);
 			})
 			.attr('cy', function(d) { return y_scale(d.y); })
-			.attr('fill', function(_d, _i) { return handle_color(_d, _i); })
+			.attr('fill', function(_d, _i) { console.log('circle', _i); return handle_color(_d, _i); })
 			.attr('stroke', 'black')
 			.attr('stroke-width', 2)
-			.on('mouseover', function(_d, _i) {
+			.on('mouseover', (function(_d, _i) { // Para la selection.on, recordar que la funcion debe pasarse entre parentesis
+												 // TODO: investigar por que
 				var _current = d3.select(this);
 				_current.attr('fill', 'red');
 				var _text = d3.select('.character');
-				_text.text(d.actor + " " + d['season_' + _i] + " Minutos");
-			})
-			.on('mouseout', function() {
+				console.log("season", _i)
+				_text.text(data.actor + " " + data['season_' + _i] + " Minutos");
+			}))
+			.on('mouseout', (function(_d, _i) {
 				var _current = d3.select(this);
-				_current.attr('fill', function(_d, _i) { return handle_color(_d, _i); });
+				_current.attr('fill', function() { return handle_color(_d, _i); });
 				var _text = d3.select('.character');
 				_text.text("Game of Thrones");
-			});
+			}));
 
 	});
-	canvas.call(axis);
+	
+	// y_axis
+	canvas.append('g')
+		.call(y_axis);
+
+	canvas.append('g')
+		.attr('transform', 'translate(0, -20)')
+		.call(x_axis);
 });

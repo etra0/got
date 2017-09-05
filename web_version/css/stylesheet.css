@@ -1,6 +1,39 @@
-h1 { color: #111; font-family: 'Helvetica Neue', sans-serif; font-size: 80px; font-weight: bold; letter-spacing: -1px; line-height: 1; text-align: center; }
+h1 {
+	color: #111;
+	font-family: 'Helvetica Neue', sans-serif;
+	font-size: 40px;
+	font-weight: bold;
+	letter-spacing: -1px;
+	line-height: 1;
+	text-align: center;
+}
 
-h2 { color: #111; font-family: 'Open Sans', sans-serif; font-size: 30px; font-weight: 300; line-height: 32px; margin: 0 0 72px; text-align: center; }
+h2 {
+color: #111;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 30px;
+	font-weight: 300;
+	line-height: 32px;
+	margin: 0 0 72px;
+	text-align: center;
+}
 
-p { color: #685206; font-family: 'Helvetica Neue', sans-serif; font-size: 14px; line-height: 24px; margin: 0 0 24px; text-align: justify; text-justify: inter-word; }
+p {
+	color: #685206;
+	font-family: 'Helvetica Neue', sans-serif;
+	font-size: 14px;
+	line-height: 24px;
+	margin: 0 0 24px;
+	text-align: justify;
+	text-justify: inter-word;
+}
+
+.container div {
+	font: 10px sans-serif;
+	background-color: steelblue;
+	text-align: right;
+	padding: 3px;
+	margin: 1px;
+	color: white;
+}
 
