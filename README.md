@@ -9,7 +9,7 @@ de la data, y eso es lo que hice aquí.
 * [ ] Re diseñar los paths, para que se dibuje uno punto por punto
 * [ ] Revisar la muestra de datos (en algunos personajes como Ned y Caitlyn
 muestra datos erroneos
-* [*] Have fun
+* [x] Have fun
 
 ## Resultados
 
