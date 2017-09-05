@@ -54,7 +54,7 @@ d3.json('./data.json', function(data) {
 		current_line = canvas.append('g');
 
 		var handle_color = function(_d, _i, circle=true) {
-			if (data.death === _i + 1 && circle)
+			if (data.death === _i && circle)
 				return "white";
 			else {
 				console.log("current death:", data.death, "supposed death:", _i + 1);
@@ -62,52 +62,54 @@ d3.json('./data.json', function(data) {
 			}
 		}
 
-		// definition of the data points that will be used in 
-		// the draw of the path
+		// definicion de los puntos finales a ocupar
 		var data_points = (function() {
 			var _d = [
 				{x: 0, y: data.i_season_1},
-				{x: 1, y: data.i_season_1},
-				{x: 2, y: data.i_season_2},
-				{x: 3, y: data.i_season_3},
-				{x: 4, y: data.i_season_4},
-				{x: 5, y: data.i_season_5},
-				{x: 6, y: data.i_season_6},
-				{x: 7, y: data.i_season_7}]
+				{x: 1, y: data.i_season_1, dur: data.season_1},
+				{x: 2, y: data.i_season_2, dur: data.season_2},
+				{x: 3, y: data.i_season_3, dur: data.season_3},
+				{x: 4, y: data.i_season_4, dur: data.season_4},
+				{x: 5, y: data.i_season_5, dur: data.season_5},
+				{x: 6, y: data.i_season_6, dur: data.season_6},
+				{x: 7, y: data.i_season_7, dur: data.season_7}]
 
 			// we clean all the first nodes major than 10
-			for (_i = 0; _i < _d.length; _i++) {
-				if (_d[_i].y <= 10) {
-					for (_j = 0; _j < _i; _j++) {
-						_d[_j].x = _d[_i].x;
-						_d[_j].y = _d[_i].y;
-					}
-
-					break;
-				}
-			}
-
-			var _all_major = true;
-			for (_i = 0; _i < _d.length; _i++) {
-				// if we encounter one variable major than 10, we have
-				// to verify if the next ones are major than 10 too.
-				if (_d[_i].y > 10) {
-					_all_major = true;
-					for (_j = _i; _j < _d.length; _j++) {
-						// if not, we change _all_major to false
-						if (_d[_j].y < 10) {
-							_all_major = false;
-						}
-					}
-					if (_all_major) {
-						for (_j = _i; _j < _d.length; _j++) {
-							_d[_j].x = _d[_i-1].x;
-							_d[_j].y = _d[_i-1].y;
-						}
-					}
-					break;
-				}
-			}
+			// TODO: FIXEAR ESTA WEAITA!!
+			// buscar alguna forma mas apropiada de 
+			// eliminar los nodos de mejor forma
+//			for (_i = 0; _i < _d.length; _i++) {
+//				if (_d[_i].y <= 10) {
+//					for (_j = 0; _j < _i; _j++) {
+//						_d[_j].x = _d[_i].x;
+//						_d[_j].y = _d[_i].y;
+//					}
+//
+//					break;
+//				}
+//			}
+//
+//			var _all_major = true;
+//			for (_i = 0; _i < _d.length; _i++) {
+//				// if we encounter one variable major than 10, we have
+//				// to verify if the next ones are major than 10 too.
+//				if (_d[_i].y > 10) {
+//					_all_major = true;
+//					for (_j = _i; _j < _d.length; _j++) {
+//						// if not, we change _all_major to false
+//						if (_d[_j].y < 10) {
+//							_all_major = false;
+//						}
+//					}
+//					if (_all_major) {
+//						for (_j = _i; _j < _d.length; _j++) {
+//							_d[_j].x = _d[_i-1].x;
+//							_d[_j].y = _d[_i-1].y;
+//						}
+//					}
+//					break;
+//				}
+//			}
 
 			return _d;
 		})();
@@ -161,8 +163,8 @@ d3.json('./data.json', function(data) {
 				var _current = d3.select(this);
 				_current.attr('fill', 'red');
 				var _text = d3.select('.character');
-				console.log("season", _i)
-				_text.text(data.actor + " " + data['season_' + _i] + " Minutos");
+				console.log("season", _d)
+				_text.text(data.actor + " " + _d.dur + " minutos");
 			}))
 			.on('mouseout', (function(_d, _i) {
 				var _current = d3.select(this);
